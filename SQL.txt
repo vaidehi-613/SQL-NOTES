@@ -1,0 +1,363 @@
+=====------------=======================---------------------------===================---------------------------===========================
+WHEN WE WANT TO WORK ON ORACLE DB 
+1. CONNECT TO ORACLE DB SERVER
+2. COMMUNICATE WITH ORACLE DB 
+
+=====================================================================================================================================
+HOW TO CONNECT TO ORACLE19C :
+        STEP 1: click on SQLPLUS icon 
+            enter username : system (default user/DBA )
+            enter password : oracle
+            
+======================================================================================================================================
+[# how to create a new user in oracle19c:] 
+
+syntax:
+CREATE USER <username> IDENTIFIED BY <password>;
+
+ex:
+SQL> CREATE USER mydb IDENTIFIED BY 123;
+
+User created.
+-----------------------------------------------------------------------------------------------------------------
+#note : every new user is dummy user (no permission ) in oracle . Before it gets actived
+-----------------------------------------------------------------------------------------------------------------
+syntax : to connect the user 
+
+CONN 
+    USERNAME:system
+    Password: oracle
+ex:
+
+SQL> CONN
+Enter user-name: mydb
+Enter password:
+ERROR:
+ORA-01045: user MYDB lacks CREATE SESSION privilege; logon denied
+Warning: You are no longer connected to ORACLE.
+
+------------------------------------------------------------------------------------------------------------------
+#note : new user is not directly connected using CONN.The DBA(default user) needs to Grant the permission to connect.
+--------------------------------------------------------------------------------------------------------------------
+syntax: to grant permission :
+
+GRANT <permission name> TO <newuser>;
+
+ex:
+
+SQL> CONN
+Enter user-name: system /oracle
+Connected.
+SQL> GRANT CONNECT TO mydb;
+Grant succeeded.
+
+SQL> CONN
+Enter user-name: mydb /123
+Connected.
+
+========================================================================================================================
+[# how to change a password of newuser]
+
+syntax:
+PASSWORD (press enter)
+ex:
+
+SQL> PASSWORD
+Changing password for MYDB
+Old password: 123
+New password: mydb123
+Retype new password: mydb123
+Password changed
+
+====================================================================================================================================
+[# how to create new_password if we forget password:]
+syntax:
+
+ALTER USER <username> IDENTIFIED BY <new_password>;
+
+SQL> CONN
+Enter user-name: system /oracle
+Connected.
+SQL> ALTER USER mydb IDENTIFIED BY mydb613;
+
+User altered.
+
+SQL> CONN
+Enter user-name: mydb /mydb123
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> conn
+Enter user-name: mydb /mydb613
+Connected.
+-------------------------------------------------------------------------------------------------------------------------------
+note: First connect to the system dba then alter the password.
+-------------------------------------------------------------------------------------------------------------------------------
+**for practice vaidehi again changed the password to mydb123
+
+
+==========================================================================================================================================
+(PROBLEM 1.)  ## if account is locked
+
+ex:(acc locked)
+
+Enter user-name: mydb /mydb123
+ERROR:
+ORA-28000: The account is locked.
+
+[# what to do??]
+
+[## STEP 1: connect to the system administrator then execute:]
+
+Enter user-name: system/oracle
+Last Successful login time: Thu Aug 18 2022 19:41:30 +05:30
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+[## STEP 2: HOW TO UNLOCK/ LOCK USER :]
+
+Syntax:
+
+ALTER <username> ACCOUNT LOCK/UNLOCK;
+
+ex:
+
+SQL> ALTER USER mydb ACCOUNT UNLOCK;
+
+User altered.
+
+SQL> conn
+Enter user-name: mydb/mydb123
+Connected.
+
+
+=====================================================================================================================================
+(# WHAT TO DO IF WE GET THE ERROR: (TNS: protocol adapter error.) )
+
+[## STEP1: go to services ] 
+[## step2: go to oracleservices orcl ]
+[## step3: make it to running mode by choosing automatic ]
+ 
+
+===============================================================================================================================================
+================================================================================================================================================
+2.HOW TO COMMUNICATE WITH ORACLE DB:
+        -BY USING "SQL - STRUCTURE QUERY LANGANGE "
+        -introduced by IBM for "Communicating with the Database "
+        -initially it was called as "Sequel"- STRUCTURE ENGLISH QUERY LANGANGE.
+
+[## sub-languages in sql :]
+1. DDL - Data Definition Language 
+2. DML - Data Manipulation Language 
+3. DCL - Data Control Language 
+4. DQL - Data Query Language 
+5. TCL - Transition Control Language 
+
+[# DATA TYPES SUPPORTED IN ORACLE:]
+        -What is datatype :
+         it is a attribute which is used to store the type of data into a column
+
+1.Numeric datatype
+2.Character / string datatype
+3.Long datatype
+4.Date datatype
+5.Raw & Long Raw datatypes
+6.Lob datatype (Large objects datatype)
+
+1) Numeric datatype:
+     i) INT 
+      -stores integer format values only.
+      -when we use "int" datatype on column at the time table creation internally oracle db server is converting
+       into "number(38)"
+
+
+    ii) NUMBER(P,S)
+      - can store integer and also float values into column.
+          number(p): storing integer values only.
+          number(p,s): storing float values only.
+        
+        p - (precision): counting all digits including left & right sides of dot of given float expression.
+            ex:
+                56.23
+                precision = 4
+
+                7323.45
+                precision = 6
+
+        s - (scale): digits to the right side of the dot only.
+            ex:
+              342.45
+              scale = 2
+
+              5452.123
+              scale = 3
+
+
+=======================================================================================================================
+2) Character /string datatype:
+      - storing string format data only.
+      - string are represented in 'single quotes' , double quotes are not allowed in db.
+
+      #string format data:
+          i)  charaters only - string format data (a-z, A-Z)
+            ex: 
+               'Smith','smith' ,...etc
+
+          ii) alphanumeric - string format data(a-z, A-Z ,0-9, special charcater(@,$,&,...) )
+            ex: 
+               'pawar.vaidehi613@gamil.com' ,.... etc
+                
+      
+
+    ## There are agian 2 types of datatype in string:
+      1) Non - Unicode datatypes
+                  - to store localized data (supporting english only )
+
+                  i) char(size)
+                  ii) varchar2(size)
+
+      2) Unicode datatypes
+                  - to store globalized data (all languages i.e National lang's)
+
+                  i) Nchar(size)
+                  ii) Nvarchar2(size)
+
+                  - "N" stands for National.
+--------------------------------------------------------------------------------------------------------
+# STORES LOCALIIZED DATA:
+
+a) CHAR(SIZE) : 
+            - fixed length datatype (static datatype)
+            - 1 char = 1 byte 
+            - max size is 2000 bytes.
+
+            ex: 
+                  Empname char(10)
+                  ----------------
+                  'sai' -------> req. 3 bytes  & remaining 7 bytes wasted
+                  'sanika' -----> req. 6 bytes & remaining 4 bytes wasted.
+
+b) VARCHAR(SIZE) : 
+            - fixed length datatype (dynamic datatype)
+            - 1 char = 1 byte 
+            - max size is 4000 bytes.
+
+            ex: 
+                  Empname varchar(10)
+                  ----------------
+                  'sai' -------> req. 3 bytes  & remaining 7 bytes saved
+                  'sanika' -----> req. 6 bytes & remaining 4 bytes saved.
+
+
+----------------------------------------------------------------------------------------------------------------
+# STORES GLOBALIZED DATA:
+
+a) NCHAR(SIZE) : 
+            - fixed length datatype (static datatype)
+            - 1 char = 1 byte 
+            - max size is 2000 bytes.
+
+            ex: 
+                  Empname Nchar(10)
+                  ----------------
+                  'sai' -------> req. 3 bytes  & remaining 7 bytes wasted
+                  'sanika' -----> req. 6 bytes & remaining 4 bytes wasted.
+
+b) NVARCHAR(SIZE) : 
+            - fixed length datatype (dynamic datatype)
+            - 1 char = 1 byte 
+            - max size is 4000 bytes.
+
+            ex: 
+                  Empname Nvarchar(10)
+                  ----------------
+                  'sai' -------> req. 3 bytes  & remaining 7 bytes saved
+                  'sanika' -----> req. 6 bytes & remaining 4 bytes saved.
+
+=====================================================================================================================================
+
+3)Long datatype :
+       - to store Unicode and also Non-Uincode char's.
+       - i char = 1 byte 
+       - (dynamic datatype )
+       - max size 2GB.
+
+
+====================================================================================================================================
+
+4) Date datatypes: 
+      - store date & time information 
+      - range of date from '01-jan-4712 bc' to '31-dec-9999ac'
+
+
+      i)DATE: 
+          - storing date & time information of particular day.
+           but time is optional. if user has not enter time then oracle server will take the time 
+           '12:00:00:am' or '00:00:00am'
+          - default date format of oracle : 'dd-mon-yyyy/yy hh:mi:ss'
+            ex:
+                '06-jan-2022/22 19:45:SS'
+
+          - this datatype is occupies 7 bytes memory (fixed memory)
+            ex:
+                'DD-MON-YYYY/YY HH:MI:SS'
+                 1   1     2     1  1  1
+
+
+      ii) timestamp: 
+            - storing date & time information along with milliseconds of particular day.
+              ex: 
+                  '06-jan-2022/22 19:45:52.1000'
+            - occupied 11 bytes memory (fixed memory)
+             ex:
+                'DD-MON-YYYY/YY HH:MI:SS.MS'
+                 1   1     2     1  1  1  4
+
+===================================================================================================================
+
+5)Raw & Long Raw datatype:
+          -store binary format (i.e video / image / audio ).
+
+              - Raw ----> 2000 bytes 
+              - Long Raw ------> 2GB
+
+
+========================================================================================================================
+
+6) Lob datatyps(Large Objects datatypes):
+
+        i) Clob: 
+              The CLOB data type stores single-byte and multibyte character data.
+               Both fixed-width and variable-width character sets are supported,
+               and both use the database character set.
+
+          -   char(size)---->2000 bytes 
+          - varchar2(size)  ----->4000 bytes 
+          - Clob --------->4GB
+
+
+        ii) NClob:
+                - national character large object 
+                - store unicode char 
+
+
+            - Nchar(size)  ----->2000bytes
+            - Nvarchar2(size) ------->4000 bytes 
+            - Long ----------->2GB
+            - NClob ---------->4GB
+
+        iii) Blob
+              -Binary Large Object 
+              - store binary format data 01010101010100010101(i.e video / image / audio ).
+
+            - Raw ---------->2000 bytes
+            - Long Raw --------> 2GB
+            - Blob -----------> 4GB
+
+
+
+=========================================================================================================================================

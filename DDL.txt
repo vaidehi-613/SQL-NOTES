@@ -1,0 +1,362 @@
+1.DDL - (Data Definitation Language)
+- It consists of the SQL commands that can be used to define the database schema.
+- It simply deals with descriptions of the database schema and is used to create
+  and modify the structure of database objects in the database.
+- DDL is a set of SQL commands used to create, modify, and delete database structures but not data. 
+
+ 
+ ##Commands:
+1) Create 
+2) Alter
+3) Rename 
+4) Truncate
+5) Drop
+
+
+ 1. CREATE : 
+ - creates a new table in oracle db.
+ - create a new db object in oracle (new db objects are : tables, views, synonyms, index, cluster,
+                                                         sequenuce, produre, functions, triggers, packages,...etc )
+syntax:
+----------
+CREATE TABLE <table_name>(<column1> <datatype>[size], <column2> <datatype>, <column3> <datatype>[size],......);
+
+note: we can create 1000 cloumns in single table.
+
+ex.
+SQL> CREATE TABLE STUDENT(STID INT,SNAME CHAR(20),FEE NUMBER(6,2));
+-------------------------------------------------------------------------------------------------------------------------
+[## TO Create the table permission should be Granted by System so used:]
+
+GRANT CREATE TABLE to <mydb>;
+
+ex:
+SQL> CONN
+Enter user-name: system/oracle
+Connected.
+SQL> GRANT create table to mydb;
+
+Grant succeeded.
+--------------------------------------------------------------------------------------------------------------------------
+
+[## To view the structure of a table / describation of table :]
+syntax:
+
+DESC <TABLE_NAME>; 
+
+ex: 
+SQL> DESC STUDENT;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ STID                                               NUMBER(38)
+ SNAME                                              CHAR(20)
+ FEE                                                NUMBER(6,2)
+
+---------------------------------------------------------------------------------
+note: BY default in oracle every column is accepting Null value.
+==========================================================================================================================
+
+2. ALTER:
+      -To change the structure of a table.
+      - sub- language of alter command 
+            1) Alter - Modify
+            2) Alter - Add 
+            3) Alter - Rename 
+            4) Alter - Drop
+
+i) Alter - Modify
+      - To change the datatype and also the size of the datatype of a particular column in a table.
+    
+    syntax:
+     
+     Alter Table <tablename> Modify <Column_name> <new_datatype>[New_size];
+
+    ex:
+    SQL>  Alter Table STUDENT Modify SNAME Varchar2(20);
+
+    Table altered.
+
+    SQL> desc student;
+    Name                                      Null?    Type
+    ----------------------------------------- -------- ----------------------------
+    STID                                               NUMBER(38)
+    SNAME                                              VARCHAR2(20)
+    FEE                                                NUMBER(6,2)
+
+ii) Alter - Add 
+            - To new column to an existing table.
+            - BY default the new column is added to the table at last.
+    syntax:
+
+    ALTER TABLE <table_name> ADD <new_column_name> <datatype>[size];
+
+    ex:
+    SQL> ALTER TABLE student  ADD SADDRESS VARCHAR(20);
+
+Table altered.
+
+SQL> DESC STUDENT;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ STID                                               NUMBER(38)
+ SNAME                                              VARCHAR2(20)
+ FEE                                                NUMBER(6,2)
+ SADDRESS                                           VARCHAR2(20)
+
+
+iii) Alter - Rename :
+              - TO change the name of column from the table.
+
+              syntax:
+
+              ALTER TABLE <table_name> RENAME COLUMN <old_col_name> TO <new_col_name>;
+
+              EX:
+              SQL> ALTER TABLE Student RENAME COLUMN  SNAME TO STUDENTNANME;
+
+                  Table altered.
+
+                  SQL> DESC STUDENT;
+                  Name                                      Null?    Type
+                  ----------------------------------------- -------- ----------------------------
+                  STID                                               NUMBER(38)
+                  STUDENTNANME                                       VARCHAR2(20)
+                  FEE                                                NUMBER(6,2)
+                  SADDRESS                                           VARCHAR2(20)
+
+
+iv) Alter - Drop :
+        - To delete or remove a cloumn from a table.
+
+        syntax:
+
+        ALTER TABLE <table_name> DROP COLUMN <column_name>;
+
+        ex:
+        SQL> ALTER TABLE STUDENT DROP COLUMN FEE;
+
+            Table altered.
+
+            SQL> DESC STUDENT;
+            Name                                      Null?    Type
+            ----------------------------------------- -------- ----------------------------
+            STID                                               NUMBER(38)
+            STUDENTNANME                                       VARCHAR2(20)
+            SADDRESS                                           VARCHAR2(20)
+
+==============================================================================================================================
+
+3) RENAME:
+      - TO rename the table name.
+
+      syntax :
+      RENAME <old_tb_name> TO <new_tb_name>;
+
+      ex: 
+      SQL> RENAME student TO stud_info;
+
+      Table renamed.
+
+      SQL> DESC stud_info;
+      Name                                      Null?    Type
+      ----------------------------------------- -------- ----------------------------
+      STID                                               NUMBER(38)
+      STUDENTNANME                                       VARCHAR2(20)
+      SADDRESS                                           VARCHAR2(20)
+
+ =======================================================================================================
+
+ 4)TRUNCATE :
+        - TO delete ALL rows from a table (but not columns).
+        - TO delete specific row is not possible. As it does not support "WHERE" Condition with TRUNCATE command.
+            EX:
+              SQL> SELECT * FROM STUDENT;
+
+            STID STUDENTNANME         SADDRESS
+      ---------- -------------------- --------------------
+              1 SMITH                NEW_YORK
+              2 NIANA                LA
+              3 WILLIAM              TEXAS
+
+            SQL> TRUNCATE TABLE STUDENT WHERE STID=2;
+            TRUNCATE TABLE STUDENT WHERE STID=2
+                                  *
+            ERROR at line 1:
+            ORA-03291: Invalid truncate option - missing STORAGE keyword
+ 
+
+
+      syntax:
+      TRUNACTE TABLE <table_name>;
+
+      EX:
+      SQL> TRUNCATE TABLE STUDENT;
+
+      Table truncated.
+
+      SQL> SELECT *FROM STUDENT;
+
+      no rows selected
+-------------------------------------------------------------------------------
+NOTE: rows data is permanently deleted (we cannot restore the data.)
+      we generally dont use truncate command as it delete complete rows in the table but 
+      the structure is note deleted i.e. column name are not delete
+------------------------------------------------------------------------------------------------------------------------------------------      
+
+4) DROP:
+      - To Drop / Delete a Table from database entierly i.e rows & columns also.
+
+      SYNTAX: 
+      DROP TABLE <table_name>;
+
+      ex:
+      SQL> SELECT * FROM STUDENT;
+
+      STID STUDENTNANME         SADDRESS
+---------- -------------------- --------------------
+         1 SMITH                NEW_YORK
+         2 NIANA                LA
+
+      SQL> DROP TABLE STUDENT;
+
+      Table dropped.
+
+      SQL> DESC STUDENT;
+      ERROR:
+      ORA-04043: object STUDENT does not exist
+
+-------------------------------------------------------------------------------------------
+NOTE: - Before oracle 10g enterprise edition once we drop a table i.e permanently deleted.
+      but from oracle 10g enterprise edition once we drop a table i.e. temporary only.
+
+===============================================================================================================================
+Q. Then where is the dropped table??  -----> RECYCLEBIN
+    RECYCLEBIN :
+          - Is a pre-defined / system defined table.
+          - Is used to store the information about dropped tables from DB.  
+
+    que. HOW TO VIEW DROPPED TABLES INFORAMTION IN RECYCLEBIN:      
+    SQL> select OBJECT_NAME,ORIGINAL_NAME FROM RECYCLEBIN;
+
+        OBJECT_NAME                                     ORIGINAL_NAME
+-------------------------------------                -------------------
+BIN$/t/rw0vLTFGMJHyKrxe+hg==$0                             STUDENT
+
+
+Q. How to restore dropped table??   -------> FLASHBACK
+
+    FLASHBACK  : 
+    - It is DDL command 
+    - It used to restore a table from Recyclebin.
+ 
+syntax:
+FLASHBACK TABLE <table_name> TO BEFORE DROP;
+
+ex:
+SQL> FLASHBACK TABLE STUDENT TO BEFORE DROP;
+
+Flashback complete.
+
+SQL> select OBJECT_NAME,ORIGINAL_NAME FROM RECYCLEBIN;
+
+no rows selected
+
+SQL> SELECT * FROM TAB;
+
+TNAME
+--------------------------------------------------------------------------------
+TABTYPE        CLUSTERID
+------------- ----------
+STUDENT
+TABLE
+     
+-----------------------------------------------------------------------------------------------------------------------
+note : The student Table is restored.
+----------------------------------------------------------------------------------------------------------------------
+
+Q. How to drop table permanently??   ------> PURGE 
+       PURGE :
+            -which is used to drop a table permanently.
+
+
+      syntax: to drop a specific table from recyclebin permanently:
+
+      PURGE TABLE <table_name>;
+
+      ex:
+
+      SQL> SELECT *FROM TAB;
+
+      TNAME
+      --------------------------------------------------------------------------------
+      TABTYPE        CLUSTERID
+      ------------- ----------
+      STUDENT
+      TABLE
+
+      TEST
+      TABLE
+
+
+      SQL> DROP TABLE TEST;
+
+      Table dropped.
+
+      SQL> DESC TABLE;
+      ERROR:
+      ORA-00931: missing identifier
+
+
+      SQL> DESC TEST;
+      ERROR:
+      ORA-04043: object TEST does not exist
+
+
+      SQL> SELECT OBJECT_NAME,ORIGINAL_NAME FROM RECYCLEBIN;
+
+      OBJECT_NAME
+      --------------------------------------------------------------------------------
+      ORIGINAL_NAME
+      --------------------------------------------------------------------------------
+      BIN$K+xVqGaPQOuLzojZP4RW7w==$0
+      TEST
+
+
+      SQL> PURGE TABLE TEST;
+
+      Table purged.
+
+      SQL> FLASHBACK TABLE TEST TO BEFORE DROP;
+      FLASHBACK TABLE TEST TO BEFORE DROP
+      *
+      ERROR at line 1:
+      ORA-38305: object not in RECYCLE BIN
+
+
+      SQL> SELECT OBJECT_NAME,ORIGINAL_NAME FROM RECYCLEBIN;
+
+      no rows selected
+
+--------------------------------------------------------------------------------------------------------------
+     @ to drop all table from recyclebin??
+
+     syntax:
+     PURGE RECYCLEBIN;
+ ----------------------------------------------------------------------------------
+    @ To drop a table from database permanently?
+    syntax:
+    Drop table <table_name> Purge;
+    
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
